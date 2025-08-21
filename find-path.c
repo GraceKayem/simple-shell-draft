@@ -33,6 +33,7 @@ char *find_command(char *command)
      
     /* Get PATH */
     path = getenv("PATH");
+    printf("PATH: %s\n", path);
     if (path == NULL)
     {
         return (NULL);
@@ -60,7 +61,7 @@ char *find_command(char *command)
         }
         
         snprintf(full_path, length, "%s/%s", directory, command);
-        
+        printf("Trying: %s\n", full_path);
         if (access(full_path, X_OK) == 0)
         {
             free(path_copy);
@@ -86,6 +87,9 @@ int handle_command(char *command, char **args)
 {
     char *full_path;
     pid_t pid;
+
+    /*debugging*/
+    printf("Debug: Command='%s', args[0]='%s'\n", command, args[0]);
     
     full_path = find_command(command);
     if (full_path == NULL)
@@ -104,7 +108,8 @@ int handle_command(char *command, char **args)
     
     if (pid == 0) 
     {
-        execve(full_path, args, environ);
+	printf("Debug: Executing command at path: %s\n", full_path);
+	execve(full_path, args, environ);
         perror("execve");
         exit(1);
     }
