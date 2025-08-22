@@ -76,40 +76,44 @@ int main(int ac, char **av)
 			continue;
 		}
 
-		child = fork();
-		find_command(line);
-
-		if (child < 0)
-		{
-			perror("Fork failed");
-			exit(EXIT_FAILURE);
-		}
-		else if (child == 0)
-		{
-			exec_return = execve(av[0], av, environ);
-			if (exec_return == -1)
-			{
-				perror("./shell");
-				exit(EXIT_FAILURE);
-			}
-		}
-		else
-		{
-			int status;
-			wait(&status);
-
-			if (WIFEXITED(status))
-				exec_return = WEXITSTATUS(status);
-			else
-				exec_return = 1;
-		}
-
-		free_argv(av);
-		if (exec_return == 2)
+		
+                pid_t pid;
+		if (tokens[0] == NULL)
 		{
 			free(line);
-			return (exec_return);
+			free(input_copy);
+			free(token);
+			continue;
 		}
+		
+
+		char *cmd_path = find_command(tokens[0]);
+
+		pid_t = fork();
+		if (pid < 0)
+		{
+			perror("Erreor")
+			free(line);
+			free(input_copy);
+			free(token);
+			continue;
+		}
+
+		if (pid == 0)
+		{
+			if (execve(cmd_path, tokens, environ) == -1)
+			{
+				perror("command not found");
+			}
+		}
+		else 
+		{
+			waitpid(pid, &status, 0);
+		}
+		free(line);
+		free(input_copy);
+		free(token);
+		
 	}
 
 	free(line);

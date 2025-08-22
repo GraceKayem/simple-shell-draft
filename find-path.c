@@ -22,7 +22,7 @@ char *find_command(char *command)
     }
    
    /*checking the first index of a command -- Absolute vs relative path check*/
-     if (command[0] == '/' || strncmp(command, "./", 2) == 0)
+     if (*command == '/' || *command == '.')
      {
         if (access(command, X_OK) == 0)
         {
