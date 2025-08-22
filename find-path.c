@@ -61,7 +61,7 @@ char *find_command(char *command)
         }
         
         snprintf(full_path, length, "%s/%s", directory, command);
-        printf("Trying: %s\n", full_path);
+        printf("No such file or directiory: %s\n", full_path);
         if (access(full_path, X_OK) == 0)
         {
             free(path_copy);
