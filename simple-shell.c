@@ -31,6 +31,7 @@ int only_spaces(char *line)
  * Return: 0
  */
 extern char **environ;
+char *find_command(char *command);
 
 int main(int ac, char **av)
 {
@@ -76,6 +77,7 @@ int main(int ac, char **av)
 		}
 
 		child = fork();
+		find_command(line);
 
 		if (child < 0)
 		{
