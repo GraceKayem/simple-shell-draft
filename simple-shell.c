@@ -74,7 +74,7 @@ int main(int ac, char **av)
 			free_argv(av);
 			continue;
 		}
-
+		/* Insert the call to the PATH helper function here */
 		child = fork();
 
 		if (child < 0)
