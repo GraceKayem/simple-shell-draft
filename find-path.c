@@ -33,7 +33,6 @@ char *find_command(char *command)
      
     /* Get PATH */
     path = getenv("PATH");
-    printf("PATH: %s\n", path);
     if (path == NULL)
     {
         return (NULL);
@@ -51,6 +50,10 @@ char *find_command(char *command)
     directory = strtok(path_copy, ":");
     while (directory != NULL)
     {
+        if (strlen(directory) == 0)
+                {
+                        directory = ".";
+                }
         /*determine the length of the directory*/
         length = strlen(directory) + strlen (command) + 2;
         full_path = malloc(sizeof(char) * length);
@@ -60,8 +63,8 @@ char *find_command(char *command)
             return (NULL);
         }
         
-        snprintf(full_path, length, "%s/%s", directory, command);
-        printf("No such file or directiory: %s\n", full_path);
+        sprintf(full_path, "%s/%s", directory, command);
+
         if (access(full_path, X_OK) == 0)
         {
             free(path_copy);
@@ -72,6 +75,7 @@ char *find_command(char *command)
         /*Tokenizing*/
         directory = strtok(NULL, ":");
     }
+
     free(path_copy);
     /*PATH not found*/
     return (NULL); 
