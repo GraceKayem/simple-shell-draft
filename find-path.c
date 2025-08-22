@@ -85,39 +85,43 @@ char *find_command(char *command)
  */
 int handle_command(char *command, char **args)
 {
-    char *full_path;
-    pid_t pid;
+    char *paths_array;
+    int i = 0, int j = 0;
+    struct stat sb;
 
     /*debugging*/
     printf("Debug: Command='%s', args[0]='%s'\n", command, args[0]);
     
-    full_path = find_command(command);
+    paths_array = find_path(); //Process $PATH into array of paths
     if (full_path == NULL)
     {
         fprintf(stderr, "%s: Command not found\n", command);
         return (1);
     }
+    /* Implement logic to check for file called [command] in paths in $PATH
+     * Something like:
+     *   for path in paths_array
+     *     check if user_input is in path
+     *     if yes, return path
+     *     if no, return 1 or similar */
 
-    pid = fork();
-    if (pid == -1) 
+    while (paths_array[i] != '\0') //loop through paths in path_array
     {
-        perror("Error:");
-        free(full_path);
-        return (1);
+	    sb = stat(paths_array[i], &sb);
+	    if (sb == -1)
+	    {
+		    perror("lstat");
+		    exit(EXIT_FAILURE);
+	    }
+	    if (sb == 0)
+	    {
+		    return (paths_array[i]);
+	    }
+	    i++;
     }
-    
-    if (pid == 0) 
-    {
-	printf("Debug: Executing command at path: %s\n", full_path);
-	execve(full_path, args, environ);
-        perror("execve");
-        exit(1);
-    }
-    else
-    {
-        wait(NULL);
-    }
-    
-    free(full_path);
+
+    return (1);
+    /* This function can then be called by simple-shell.c */
+
     return (0);
 }
