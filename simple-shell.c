@@ -35,7 +35,7 @@ char *find_command(char *command);
 
 int main(int ac, char **av)
 {
-	char *line;
+	char *line, *cmd_path;
 	size_t buffer_size = 256;
 	ssize_t nread;
 	int child;
@@ -76,43 +76,51 @@ int main(int ac, char **av)
 			continue;
 		}
 
-		
-                pid_t pid;
-		if (tokens[0] == NULL)
-		{
-			free(line);
-			free(input_copy);
-			free(token);
+		/* search for command in PATH */
+		cmd_path = find_command(av[0]);
+		if (cmd_path == NULL)
+                {
+			fprintf(stderr, "%s: command not found\n", av[0]);
+                        free_argv(av);
 			continue;
-		}
-		
+                }
 
-		char *cmd_path = find_command(tokens[0]);
-
-		pid_t = fork();
-		if (pid < 0)
+		child = fork();
+		if (child < 0)
 		{
-			perror("Erreor")
-			free(line);
-			free(input_copy);
-			free(token);
+			perror("Fork failed");
+			free(cmd_path);
+			free_argv(av);
 			continue;
 		}
 
-		if (pid == 0)
+		if (child == 0)
 		{
-			if (execve(cmd_path, tokens, environ) == -1)
+			exec_return = execve(cmd_path, av, environ);
+			if (exec_return == -1)
 			{
-				perror("command not found");
+				perror(av[0]);
+				free(cmd_path);
+				free_argv(av);
+				exit(EXIT_FAILURE);
 			}
 		}
 		else 
 		{
-			waitpid(pid, &status, 0);
+			int status;
+			wait(&status);
+			if (WIFEXITED(status))
+			{
+				exec_return = WEXITSTATUS(status);
+			}
+			else
+			{
+				exec_return = 1;
+			}
+			
 		}
-		free(line);
-		free(input_copy);
-		free(token);
+		free(cmd_path);
+		free_argv(av);
 		
 	}
 
